@@ -16,16 +16,17 @@ class Application:
     
 
     def handle(self,request):
-        route=self.router.match(request)
+        route=self.router.resolve(request)
         if not route:
             return Response('404 not found',404)
         
-        for mw in self.middlewares:
+        all_middlewares = self.middlewares + route.middlewares
+
+        for mw in all_middlewares:
             mw.before(request)
         
         response = route.handler(request)
 
-        for mw in reversed(self.middlewares):
+        for mw in reversed(all_middlewares):
             response = mw.after(request,response)
-        
         return response
