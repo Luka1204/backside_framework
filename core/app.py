@@ -1,0 +1,31 @@
+from core.response import Response
+class Application:
+    def __init__(self):
+        self.router = None
+        self.container = None
+        self.middlewares = []
+
+    def set_router(self,router):
+        self.router = router
+    
+    def set_container(self,container):
+        self.container = container
+
+    def add_middleware(self,middleware):
+        self.middlewares.append(middleware)
+    
+
+    def handle(self,request):
+        route=self.router.match(request)
+        if not route:
+            return Response('404 not found',404)
+        
+        for mw in self.middlewares:
+            mw.before(request)
+        
+        response = route.handler(request)
+
+        for mw in reversed(self.middlewares):
+            response = mw.after(request,response)
+        
+        return response
