@@ -8,6 +8,8 @@ class Kernel:
         route = router.match(request)
         if not route:
             return Response.text('404 Not Found', 404)
+        
+        request.params = route.params
 
         middlewares = []
         for mw in route.middlewares:

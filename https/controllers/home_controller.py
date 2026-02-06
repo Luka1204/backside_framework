@@ -4,3 +4,6 @@ from core.http.controller import Controller
 class HomeController(Controller):
     def index(self,request):
         return {"response":'Bienvenido a Backside Framework!',"Status":200}
+    
+    def admin(self, request):
+        return {"response":'Bienvenido a Admin Backside Framework!',"Status":200}

@@ -5,12 +5,29 @@ class Route:
         self.action = action
         self.name_alias = None
         self.middlewares = []
+        self.segments = self._parse_segments(uri)
+        self.params = {}
 
+    def _parse_segments(self,uri):
+        striped = uri.strip('/')
+        parsed = []
+        if(striped == ''):
+            seg = '/'
+            parsed.append(seg)
+        else:   
+            for seg in striped.split('/'):
+                if seg:
+                    parsed.append(seg)
+        return parsed
     def name(self, name):
         self.name_alias = name
         return self
     def middleware(self, *middlewares):
-        self.middlewares.extend(middlewares)
+        if isinstance(middlewares, list):
+            self.middlewares.extend(middlewares)
+        else:
+            self.middlewares.append(middlewares)
+
         return self
 
     
@@ -84,23 +101,32 @@ class Router:
         return '/' + full.strip('/')
     
     def match(self,request):
+        striped_segs = request.path.strip('/')      
+        segments = striped_segs.split('/')
+        if striped_segs == '':
+            segments = ['/']
+        method = request.method
+
         for route in self.routes:
-            if route.method != request.method:
+            if route.method != method:
                 continue
-            if route.uri == request.path:
+            if len(route.segments) != len(segments):
+                continue
+
+            params = {}
+            matched = True
+            for r_seg, q_seg in zip(route.segments, segments):
+                if r_seg.startswith('{') and r_seg.endswith('}'):
+                    key = r_seg[1:-1]
+                    params[key] = q_seg
+                elif r_seg != q_seg:
+                    matched = False
+                    break
+            
+            if matched:
+                route.params = params
                 return route
         return None
-    """ def resolve(self, request):
-        for route in self.routes:
-            if route.method != request.method:
-                continue
-            params = self._match(route.uri, request.path)
-            if params is not None:
-                request.params = params
-                request.route = route
-                return route
-            return None """
-    
     def dispatch(self, request):
         route = self.resolve(request)
         if not route:

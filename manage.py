@@ -12,4 +12,5 @@ app.register_provider(RouteServiceProvider)
 app.boot()
 
 # Run application (Application controla todo)
-app.run('GET', '/')
+app.run('GET' ,'/admin')
+app.run('GET' ,'/')
