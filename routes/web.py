@@ -1,4 +1,4 @@
-from http.controllers.home_controller import HomeController
+from  https.controllers.home_controller import HomeController
 
-def register_routes(router):
-    router.add_route('GET', '/', lambda req:HomeController(req).index())
+def routes(router):
+    router.get('/', 'HomeController@index').name('home')

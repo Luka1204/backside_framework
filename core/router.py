@@ -1,4 +1,4 @@
-class RouteDefinition:
+class Route:
     def __init__(self, method, uri, action):
         self.method = method
         self.uri = uri
@@ -43,16 +43,16 @@ class Router:
         self.middleware_groups[name] = middlewares
 
     def get(self, uri, action):
-        return self._add('GET',uri,action)
+        return self.add('GET',uri,action)
     def post(self, uri, action):
-        return self._add('POST',uri,action)
+        return self.add('POST',uri,action)
     def put(self, uri, action):
-        return self._add('PUT',uri,action)
+        return self.add('PUT',uri,action)
     
     def patch(self, uri, action):
-        return self._add('PATCH',uri,action)
+        return self.add('PATCH',uri,action)
     def delete(self, uri, action):
-        return self._add('DELETE',uri,action)
+        return self.add('DELETE',uri,action)
 
     def group(self, *,prefix='', middleware=None, routes=None):
         middleware = middleware or []
@@ -68,9 +68,9 @@ class Router:
             routes(self)
         self._group_stack.pop()
 
-    def _add(self, method, uri, action):
+    def add(self, method, uri, action):
         full_uri = self._apply_prefix(uri)
-        route = RouteDefinition(method, full_uri,action)
+        route = Route(method, full_uri,action)
 
         for group in self._group_stack:
             route.middlewares.extend(group['middleware'])
@@ -83,7 +83,14 @@ class Router:
         full = '/'.join(p.strip('/') for p in prefixes + [uri])
         return '/' + full.strip('/')
     
-    def resolve(self, request):
+    def match(self,request):
+        for route in self.routes:
+            if route.method != request.method:
+                continue
+            if route.uri == request.path:
+                return route
+        return None
+    """ def resolve(self, request):
         for route in self.routes:
             if route.method != request.method:
                 continue
@@ -92,7 +99,7 @@ class Router:
                 request.params = params
                 request.route = route
                 return route
-            return None
+            return None """
     
     def dispatch(self, request):
         route = self.resolve(request)

@@ -9,9 +9,11 @@ class Container:
     def singleton (self,key,resolver):
         self.singletons[key]=resolver
 
-    def resolve(self, key):
+    def make(self,key):
         if key in self.singletons:
             if callable(self.singletons[key]):
                 self.singletons[key] = self.singletons[key]()
             return self.singletons[key]
-        return self.bindings[key]()
+        if key in self.bindings:
+            return self.bindings[key]()
+        raise Exception(f'No binding found for key: {key}')

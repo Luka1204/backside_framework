@@ -1,14 +1,14 @@
 from core.response import Response
-
-
-
-
-class Application:
+from core.container import Container
+from core.http.kernel import Kernel
+class Application(Container):
     def __init__(self):
+        super().__init__()
         self.router = None
         self.container = None
         self.middlewares = []
         self.providers = []
+        self.singleton('kernel',lambda:Kernel(self))
 
 
     def set_router(self, router):
@@ -34,7 +34,14 @@ class Application:
             provider.boot()
 
 
-    def handle(self, request):
+    def run(self, method="GET", path="/", headers=None, body=None, query=None):
+        from core.request import Request
+        request = Request(method, path, headers, body, query)
+        kernel = self.make('kernel')
+        response = kernel.handle(request)
+        response.send()
+        return response
+    """ def handle(self, request):
         route = self.router.resolve(request)
         if not route:
             return Response('404 Not Found', 404)
@@ -54,4 +61,4 @@ class Application:
             response = mw.after(request, response)
 
 
-        return response
+        return response """
