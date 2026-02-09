@@ -10,6 +10,5 @@ conn = db.connection()
 
 rows = conn.select("SELECT 1 AS test") """
 
-print(rows)
 response = kernel.handle(Request("GET",'/'))
 response.send()
