@@ -4,10 +4,8 @@ class DatabaseServiceProvider:
         self.app=app
         
     def register(self):
-        def resolver():
-            config = self.app.make("config").get("database")
-            return DatabaseManager(config)
-        self.app.singleton("db",resolver)
+        config = self.app.make('config').get('database')
+        self.app.singleton("db",lambda:DatabaseManager(config))
     
     def boot(self):
         pass

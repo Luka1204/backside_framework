@@ -5,5 +5,11 @@ from core.request import Request
 app = create_app()
 kernel = Kernel(app)
 
+db = app.make('db')
+conn = db.connection()
+
+rows = conn.select("SELECT 1 AS test")
+
+print(rows)
 response = kernel.handle(Request("GET",'/'))
 response.send()
