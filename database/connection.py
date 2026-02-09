@@ -1,13 +1,19 @@
 import sqlite3
 
-class Database:
-    def __init__(self, db_name='database.db'):
-        self.conn = sqlite3.connect(db_name)
-        self.conn.row_factory = sqlite3.Row
-    
+class Connection:
+    def __init__(self, config):        
+        self.conn = config
+        self._connection = None
 
-    def execute(self, sql, params=None):
-        cursor = self.conn.cursor()
-        cursor.execute(sql,params or [])
-        self.conn.commit()
+    def connect(self):
+        if not self._connection: # Si no existe conexion la crea
+            self.connection = sqlite3.connect(self.config['database'])
+            self._connection.row_factory = sqlite3.Row
+        return self._connection
+
+    def execute(self, query, bindings=None):
+        bindings = bindings or []
+        cursor = self.connect().cursor()
+        cursor.execute(query, bindings)
+        self.connect().commit()
         return cursor
