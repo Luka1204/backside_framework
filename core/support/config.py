@@ -6,6 +6,7 @@ class ConfigRepository:
 
     def load(self, name):
         module = importlib.import_module(f"config.{name}")
+        
         self.items[name] = module.config()
 
     def get(self, key, default=None):
