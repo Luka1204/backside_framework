@@ -13,6 +13,6 @@ class Model:
     
     @classmethod
     def find(cls, id):
-        result = cls.db.execute(f'SELECT * FROM {cls.table} WHERE id = ?', [id])
+        result = cls.db.execute(f'SELECT * FROM {cls.table} WHERE id = %s', [id])
         row = result.fetchone()
         return dict(row) if row else None

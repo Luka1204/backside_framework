@@ -1,6 +1,7 @@
 from core.app import Application
 from core.support.env import load_env
 from core.support.config import ConfigRepository
+from core.helpers.helpers import set_app
 
 def create_app():
     load_env()
@@ -17,5 +18,6 @@ def create_app():
         app.register_provider(provider)
 
     app.boot()
+    set_app(app)
 
     return app

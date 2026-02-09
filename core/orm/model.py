@@ -1,7 +1,5 @@
 from database.query_builder import QueryBuilder
-from core.app import Application
-
-app = Application()
+from core.helpers.helpers import app
 
 class Model:
     table = None
@@ -22,7 +20,7 @@ class Model:
         super().__setattr__('attributes',{})
         super().__setattr__('original',{})
         super().__setattr__('exists',False)
-        super.__setattr('connection', None)
+        super().__setattr__('connection', None)
     
     def __getattr__(self, key):
         if key in self.attributes:
@@ -45,7 +43,7 @@ class Model:
         return dirty
     @classmethod
     def query(cls):
-        db = app.make('db')
+        db = app().make('db')
         connection = db.connection()
         return QueryBuilder(connection, cls.table)
     
@@ -75,8 +73,8 @@ class Model:
         return instance
     
     def save(self):
-        db = app.make('db')
-        connection = db.connection(self.connection_name)
+        db = app().make('db')
+        connection = db.connection()
 
         if self.exists:
             dirty = self.get_dirty()
@@ -89,14 +87,14 @@ class Model:
 
             for key, value in self.attributes.items():
                 if self.original.get(key) != value:
-                    columns.append(f"{key} = ?")
+                    columns.append(f"{key} = %s")
                     bindings.append(value)
 
             if not columns:
                 return None
             
             bindings.append(self.attributes['id'])
-            sql = f"UPDATE {self.table} SET {', '.join(columns)} WHERE id = ?"
+            sql = f"UPDATE {self.table} SET {', '.join(columns)} WHERE id = %s"
             connection.execute(sql, bindings)
 
             self.original.update(dirty)
@@ -105,7 +103,7 @@ class Model:
 
         else:
             keys = ', '.join(self.attributes.keys())
-            placeholders = ', '.join(['?'] * len(self.attributes))
+            placeholders = ', '.join(['%s'] * len(self.attributes))
             sql = f"INSERT INTO {self.table} ({keys}) VALUES ({placeholders})"
             cursor = connection.execute(sql, list(self.attributes.values()))
             self.attributes[self.primary_key] = cursor.lastrowid
@@ -118,9 +116,9 @@ class Model:
         if not self.exists:
             return
         
-        db= app.make('db')
-        connection = db.connection(self.connection_name)
-        connection.execute(f"DELETE FROM {self.table} WHERE id = ?",
+        db= app().make('db')
+        connection = db.connection()
+        connection.execute(f"DELETE FROM {self.table} WHERE id = %s",
         [self.attributes['id']])
         self.exists = False
     

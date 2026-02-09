@@ -9,7 +9,7 @@ class ControllerServiceProvider:
         self.app = app
     
     def register(self):
-        controllers_path="https/controllers"
+        controllers_path="app/https/controllers"
 
         for root,_,files in os.walk(controllers_path):
             for file in files:

@@ -10,7 +10,7 @@ class QueryBuilder:
         if value is None:
             value = operator
             operator = '='
-        self.wheres.append(f"{column} {operator} ?")
+        self.wheres.append(f"{column} {operator} %s")
         self.bindings.append(value)
         return self
 

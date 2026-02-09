@@ -2,6 +2,8 @@ import pymysql
 from database.connection import Connection
 
 class MySQLConnection(Connection):
+    placeholder = '%s'
+
     def __init__(self, config):
         self.config = config
         self.connection = None
@@ -23,9 +25,10 @@ class MySQLConnection(Connection):
     
     def execute(self, query, bindings=None):
         self.connect()
-        with self.connection.cursor() as cursor:
-            cursor.execute(query, bindings or [])
-            return cursor
+        cursor = self.connection.cursor()
+        cursor.execute(query, bindings or [])
+        self.connection.commit()
+        return cursor
         
     def select(self, query, bindings=None):
         cursor = self.execute(query,bindings)

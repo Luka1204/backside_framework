@@ -7,10 +7,14 @@ class DatabaseManager:
 
 
     def connection(self, name=None): #Administra las conexiones del frame a la BD
-        name = name or self.config['default']
+        config = self.config
+        if name is None:
+            name = config["default"]
 
         if name in self.connections:
             return self.connections[name]
+        print(name)
+        print(self.config['connections'])
         connection_config = self.config['connections'].get(name)
         if not connection_config:
             raise Exception(f"Database connection [{name}] not configured")
