@@ -1,16 +1,9 @@
-from core.app import Application
-from core.providers.route_service_provider import RouteServiceProvider
-from https.controllers.home_controller import HomeController
+from bootstrap.app import create_app
+from core.http.kernel import Kernel
+from core.request import Request
 
-app = Application()
+app = create_app()
+kernel = Kernel(app)
 
-# Controllers binding
-app.bind('HomeController', lambda: HomeController())
-
-# Providers
-app.register_provider(RouteServiceProvider)
-app.boot()
-
-# Run application (Application controla todo)
-app.run('GET' ,'/admin')
-app.run('GET' ,'/')
+response = kernel.handle(Request("GET",'/'))
+response.send()

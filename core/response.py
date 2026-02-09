@@ -6,6 +6,17 @@ class Response:
         self.status = status
         self.headers = headers or {'Content-Type':'text/html'}
 
+    def __str__(self):
+        if self.body is None:
+            return ''
+        
+        if isinstance(self.body, (bytes,bytearray)):
+            return self.body.decode(errors='ignore')
+        
+        if (isinstance(self.body, (dict, list))):
+            return json.dumps(self.body, ensure_ascii=False)
+        
+        return str(self.body)
     @staticmethod
     def json(data, status=200, headers=None):
         headers = headers or {}
