@@ -10,7 +10,7 @@ def config():
                 'port': 3306,
                 'database': 'backside',
                 'username': 'root',
-                'password': '',
+                'password': 'Tango563#43',
                 'charset': 'utf8mb4'
             },
 
