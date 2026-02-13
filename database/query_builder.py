@@ -70,11 +70,18 @@ class QueryBuilder:
         grouped = {}
 
         for r in results:
-            grouped.setdefault(r.attributes[rel.foreign_key],[]).append(r)
+            key = r.attributes[rel.foreign_key]
+            grouped.setdefault(key,[]).append(r)
 
         for m in models:
             m.attributes[relation_name] = grouped.get(m.attributes[m.primary_key],[])
 
+        if len(path) > 1:
+            children = []
+            for items in grouped.values():
+                children.extend(items)
+            
+            self._load_relation_path(children, path[1:])
     def where_in(self, column, values):
         if not values:
             self.wheres.append("1 = 0")

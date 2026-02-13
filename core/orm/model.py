@@ -197,8 +197,4 @@ class Model:
 
         return BelognsToMany(self, related, table, foreign_key, related_key, local_key, related_local_key)
     
-    def attach(self, ids):
-        if not isinstance(ids, (list,tuple,set)):
-            ids = [ids]
-            db = app().make('db')
-            conn = db.connection(self.parent.connection_name)
+    
