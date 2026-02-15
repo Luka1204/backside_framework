@@ -52,10 +52,12 @@ class Model:
     
     def __getattr__(self, key):
         if key in self.attributes:
-            return self.attributes.get(key)
+            return self.cast_attribute(key, self.attributes[key])
         
-        if hasattr(self, key):
-            relation=getattr(self, key)()
+        attr = getattr(type(self),key, None)
+        
+        if callable(attr):
+            relation= attr(self)
             self.attributes[key] = relation
             return relation
         
@@ -103,9 +105,11 @@ class Model:
     
     @classmethod 
     def find(cls, id):
-        data = cls.query().where('id',id).first()
+        data = cls.query().where(cls.primary_key,'=',id).first()
         if not data:
             return None
+        if isinstance(data,cls):
+            return cls.to_dict(data)
         return cls.hydrate(data)
     
     @classmethod

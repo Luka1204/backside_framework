@@ -8,6 +8,9 @@ class HomeController(Controller):
         user.nombre = "Luka"
         user.save()
         print(user.id)
+        id = int(user.id)
+        
+        print(user.find(1))
 
         return {"response":'Bienvenido a Backside Framework!',"Status":200}
     
